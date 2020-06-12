@@ -93,6 +93,7 @@ protected:
 		void StopFire();
 
 	FTimerHandle FiringTImer;
+	FTimerHandle ReSpawnTimer;
 
 public:
 	/** Returns CameraBoom subobject **/
@@ -114,5 +115,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		float TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Acotr")
+		void ReSpawnActor();
 };
 

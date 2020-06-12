@@ -58,6 +58,7 @@ AMultipalyabelCharacter::AMultipalyabelCharacter()
 
 	FireRate = 0.25;
 	bIsFiringWeapon = false;
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -66,6 +67,7 @@ AMultipalyabelCharacter::AMultipalyabelCharacter()
 void AMultipalyabelCharacter::OnRep_CurrentHealth()
 {
 	OnHealthUpdate();
+	//ReSpawnActor();
 }
 
 void AMultipalyabelCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -129,7 +131,12 @@ void AMultipalyabelCharacter::StartFire()
 	}
 }
 
-void AMultipalyabelCharacter::HandleFire()
+bool AMultipalyabelCharacter::HandleFire_Validate()
+{
+	return true;
+}
+
+void AMultipalyabelCharacter::HandleFire_Implementation()
 {
 	FVector spawnLocation = GetActorLocation() + (GetControlRotation().Vector() * 100.0f) + (GetActorUpVector() * 50.0f);
 	FRotator spawnRotation = GetControlRotation();
@@ -167,11 +174,28 @@ void AMultipalyabelCharacter::SetCurrentHealth(float healthValue)
 float AMultipalyabelCharacter::TakeDamage(float DamageTaken, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float damageApplied = CurrentHealth - DamageTaken;
+
+	if (damageApplied <= 0)
+	{
+		Destroy();
+		UWorld* World = GetWorld();
+		World->GetTimerManager().SetTimer(ReSpawnTimer, this, &AMultipalyabelCharacter::ReSpawnActor, 3.0f, false);
+		
+	}
 	SetCurrentHealth(damageApplied);
 	return damageApplied;
 }
 
+void AMultipalyabelCharacter::ReSpawnActor()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Respawn")));
+}
 
+
+
+/////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////
 void AMultipalyabelCharacter::OnResetVR()
 {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
